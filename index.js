@@ -1,6 +1,6 @@
 const express = require("express");
 const { connection } = require("./db");
-const { userRoute } = require("./route/user.route");
+const { UserRouter } = require("./route/user.route");
 const { EmployeeRouter } = require("./route/employ.route");
 // const { authenticate } = require("./middleware/authenticate.middleware");
 const app = express();
@@ -10,7 +10,7 @@ app.use(cors())
 
 app.use(express.json());
 
-app.use("/", userRoute);
+app.use("/", UserRouter);
 app.use("/", EmployeeRouter);
 app.get("/", (req, res) => {
   res.send("Home Page");
