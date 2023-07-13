@@ -1,60 +1,58 @@
-const express = require("express");
-const { UserModel } = require("../model/user.model");
+const express = require("express")
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-var jwt = require("jsonwebtoken");
-const UserRouter = express.Router();
+const {UserModel} = require("../model/user.model")
+const userRouter = express.Router()
 
-UserRouter.get("/", (req, res) => {
-  res.send("ok");
-});
-
-UserRouter.post("/register", async (req, res) => {
-  const {  email, password,conformpassword } = req.body;
-  const user = await UserModel.find({ email });
-  if (user.length <= 0) {
+userRouter.post("/signup", async (req, res) => {
+    const {  name,email, pass } = req.body;
     try {
-      bcrypt.hash(password, 5, async (err, hash) => {
+      bcrypt.hash(pass, 5, async (err, secure_pass) => {
         if (err) {
-          res.send({ msg: "Something went Wrong", error: err.message });
+          console.log(err);
         } else {
-          const user = new UserModel({
-           
-            email,
-          
-            password: hash,
-            conformpassword,
-          });
+          const user = new UserModel({ email, pass: secure_pass, name });
           await user.save();
-          res.send({ msg: "New user has been registered" });
+          res.send("Registered");
         }
       });
     } catch (error) {
-      res.send({ msg: "Something went Wrong", error: error.message });
+      res.send("Error in registering user");
+      console.log(error);
     }
-  } else {
-    res.send({ msg: "User already exist, please login" });
-  }
-});
-
-UserRouter.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await UserModel.find({ email });
-    if (user.length > 0) {
-      bcrypt.compare(password, user[0].password, (err, result) => {
-        if (result) {
-          const token = jwt.sign({ userId: user[0]._id }, "mannu");
-          res.send({ msg: "Logged in ", token: token });
-        }
-      });
-    } else {
-      res.send({ msg: "Wrong credentials" });
+  });
+  userRouter.post("/login", async (req, res) => {
+    const { email, pass } = req.body;
+    try {
+      const user = await UserModel.find({ email });
+  
+      if (user.length > 0) {
+        bcrypt.compare(pass, user[0].pass, (err, result) => {
+          if (result) {
+            const token = jwt.sign(
+              {
+       
+                userID: user[0]._id,
+              },
+              "mock"
+            );
+           
+            res.send({ msg: "login successful", token: token });
+          } else {
+            res.send("wrong credentials");
+          }
+        });
+      } else {
+        res.send("wrong credentials");
+      }
+    } catch (error) {
+      res.send("error");
+      console.log(error);
     }
-  } catch (error) {
-    res.send({ msg: "Something went wrong", error: error.message });
-  }
-});
+  });
 
-module.exports = {
-  UserRouter,
-};
+
+
+  module.exports ={
+    userRouter
+  }

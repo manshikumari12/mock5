@@ -4,16 +4,17 @@ require("dotenv").config()
 const auth = (req, res, next) => {
     const token = req.headers.authorization;
     if (token) {
-      jwt.verify(token, "mock", (err, decoded) => {
-        if (decoded) {
-          req.body.author = decoded.userId;
-          next();
-        } else {
-          res.send({ msg: "Please login first" });
-        }
-      });
+      const decoded = jwt.verify(token, "mock");
+      if (decoded) {
+        const userID = decoded.userID;
+        console.log(decoded);
+        req.body.userID = userID;
+        next();
+      } else {
+        res.send("Please Login First");
+      }
     } else {
-      res.send({ msg: "please login first" });
+      res.send("Please Login First111");
     }
   };
 
