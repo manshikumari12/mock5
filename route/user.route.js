@@ -9,7 +9,7 @@ UserRouter.get("/", (req, res) => {
 });
 
 UserRouter.post("/signup", async (req, res) => {
-  const {  email, password,name } = req.body;
+  const {  email, password,conformpass } = req.body;
   const user = await UserModel.find({ email });
   if (user.length <= 0) {
     try {
@@ -22,7 +22,7 @@ UserRouter.post("/signup", async (req, res) => {
             email,
           
             password: hash,
-            name,
+            conformpass,
           });
           await user.save();
           res.send({ msg: "New user has been registered" });
@@ -55,6 +55,4 @@ UserRouter.post("/login", async (req, res) => {
   }
 });
 
-module.exports = {
-  UserRouter,
-};
+module.exports = { UserRouter};
